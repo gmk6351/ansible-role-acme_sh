@@ -23,3 +23,17 @@
   ansible.builtin.apt:
     name: "{{ acmesh_req_packages }}"
     state: present
+
+- name: Ensure directories exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ acme_user }}"
+    group: "{{ acme_group }}"
+  loop:
+    - "{{ acme_home }}"
+    - "{{ acmesh_config_path }}"
+    - "{{ acmesh_install_path }}"
+    - "{{ acmesh_cert_path }}"

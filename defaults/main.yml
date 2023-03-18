@@ -7,3 +7,7 @@ acme_shell: /usr/sbin/nologin
 acmesh_req_packages:
   - sudo
   - bash
+
+acmesh_install_path: "/opt/acme.sh"
+acmesh_config_path: "/etc/opt/acme.sh"
+acmesh_cert_path: "{{ acme_home }}/certs"
