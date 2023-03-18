@@ -37,3 +37,8 @@
     - "{{ acmesh_config_path }}"
     - "{{ acmesh_install_path }}"
     - "{{ acmesh_cert_path }}"
+
+- name: Check acme.sh installation
+  ansible.builtin.stat:
+    path: "{{ acmesh_config_path }}/account.conf"
+  register: stat_account_conf
