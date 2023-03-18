@@ -115,3 +115,15 @@
   environment:
     LE_WORKING_DIR: "/opt/acme.sh"
     LE_CONFIG_HOME: "/etc/opt/acme.sh"
+
+- name: "Register account"
+  become: true
+  become_method: su
+  become_user: "{{ acme_user }}"
+  become_flags: '-s /bin/sh'
+  ansible.builtin.command:
+    cmd: "{{ acmesh_install_path }}/acme.sh --register-account"
+    creates: "{{ acmesh_config_path }}/ca/acme-v02.api.letsencrypt.org/directory/ca.conf"
+  environment:
+    LE_WORKING_DIR: "/opt/acme.sh"
+    LE_CONFIG_HOME: "/etc/opt/acme.sh"
