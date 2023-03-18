@@ -11,3 +11,6 @@ acmesh_req_packages:
 acmesh_install_path: "/opt/acme.sh"
 acmesh_config_path: "/etc/opt/acme.sh"
 acmesh_cert_path: "{{ acme_home }}/certs"
+
+acmesh_repository: https://github.com/acmesh-official/acme.sh.git
+acmesh_version: 3.0.5

@@ -42,3 +42,54 @@
   ansible.builtin.stat:
     path: "{{ acmesh_config_path }}/account.conf"
   register: stat_account_conf
+
+- name: Download and install acme.sh
+  when: "not stat_account_conf.stat.exists"
+  block:
+    - name: Create temporary directory for git repository
+      become: true
+      become_method: su
+      become_user: "{{ acme_user }}"
+      become_flags: '-s /bin/sh'
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: acmesh_git_
+      register: acme_tmp_repo
+      changed_when: False
+
+    - name: Temporary clone acme.sh git repository
+      become: true
+      become_method: su
+      become_user: "{{ acme_user }}"
+      become_flags: '-s /bin/sh'
+      ansible.builtin.git:
+        dest: "{{ acme_tmp_repo.path }}"
+        clone: true
+        depth: 1
+        repo: "{{ acmesh_repository }}"
+        version: "{{ acmesh_version }}"
+      changed_when: False
+
+    - name: Install acme.sh
+      become: true
+      become_method: su
+      become_user: "{{ acme_user }}"
+      become_flags: '-s /bin/sh'
+      ansible.builtin.command:
+        cmd: >
+          "{{ acme_tmp_repo.path }}/acme.sh"
+          --install
+          --home "{{ acmesh_install_path }}"
+          --config-home "{{ acmesh_config_path }}"
+          --cert-home "{{ acmesh_cert_path }}"
+          --accountemail "{{ acmesh_email | mandatory }}"
+          --nocron
+        chdir: "{{ acme_tmp_repo.path }}"
+        creates: "{{ acmesh_config_path }}/account.conf"
+
+  always:
+    - name: Delete temporary git clone
+      ansible.builtin.file:
+        path: "{{ acme_tmp_repo.path }}"
+        state: absent
+      changed_when: False
