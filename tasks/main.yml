@@ -17,3 +17,9 @@
     home: "{{ acme_home }}"
     shell: "{{ acme_shell }}"
     group: "{{ acme_group }}"
+
+- name: Ensure required packages are installed
+  become: true
+  ansible.builtin.apt:
+    name: "{{ acmesh_req_packages }}"
+    state: present

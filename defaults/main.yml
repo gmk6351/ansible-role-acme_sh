@@ -3,3 +3,7 @@ acme_user: acme
 acme_group: acme
 acme_home: /var/opt/acme
 acme_shell: /usr/sbin/nologin
+
+acmesh_req_packages:
+  - sudo
+  - bash
