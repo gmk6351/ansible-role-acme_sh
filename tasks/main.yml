@@ -93,3 +93,13 @@
         path: "{{ acme_tmp_repo.path }}"
         state: absent
       changed_when: False
+
+- name: "Set default CA [letsencrypt]"
+  become: true
+  become_method: su
+  become_user: "{{ acme_user }}"
+  become_flags: '-s /bin/sh'
+  ansible.builtin.lineinfile:
+    path: "{{ acmesh_config_path }}/account.conf"
+    regexp: '^DEFAULT_ACME_SERVER='
+    line: "DEFAULT_ACME_SERVER='https://acme-v02.api.letsencrypt.org/directory'"
