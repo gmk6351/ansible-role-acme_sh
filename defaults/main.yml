@@ -1,0 +1,5 @@
+---
+acme_user: acme
+acme_group: acme
+acme_home: /var/opt/acme
+acme_shell: /usr/sbin/nologin
