@@ -103,3 +103,15 @@
     path: "{{ acmesh_config_path }}/account.conf"
     regexp: '^DEFAULT_ACME_SERVER='
     line: "DEFAULT_ACME_SERVER='https://acme-v02.api.letsencrypt.org/directory'"
+
+- name: "Create account key"
+  become: true
+  become_method: su
+  become_user: "{{ acme_user }}"
+  become_flags: '-s /bin/sh'
+  ansible.builtin.command:
+    cmd: "{{ acmesh_install_path }}/acme.sh --create-account-key"
+    creates: "{{ acmesh_config_path }}/ca/acme-v02.api.letsencrypt.org/directory/account.key"
+  environment:
+    LE_WORKING_DIR: "/opt/acme.sh"
+    LE_CONFIG_HOME: "/etc/opt/acme.sh"
