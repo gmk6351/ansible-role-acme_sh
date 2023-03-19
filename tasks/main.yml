@@ -241,3 +241,14 @@
     LE_CONFIG_HOME: "{{ acmesh_config_path }}"
   loop: "{{ acme_domains }}"
   when: acme_domains is defined
+
+- name: Set key file permissions
+  become: true
+  ansible.builtin.file:
+    path: "{{ tls_cert_path }}/{{ item.domain }}.key"
+    mode: "{{ item.key_mode | default(omit) }}"
+    owner: "{{ item.key_owner | default(omit) }}"
+    group: "{{ item.key_group | default(omit) }}"
+    state: file
+  loop: "{{ acme_domains }}"
+  when: acme_domains is defined
