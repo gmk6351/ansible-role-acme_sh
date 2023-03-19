@@ -203,3 +203,14 @@
     state: present
   loop: "{{ acme_domains }}"
   when: acme_domains is defined
+
+- name: Ensure directories exist
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ acme_user }}"
+    group: "{{ acme_group }}"
+  loop:
+    - "{{ tls_cert_path }}"
