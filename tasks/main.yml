@@ -104,6 +104,32 @@
     regexp: '^DEFAULT_ACME_SERVER='
     line: "DEFAULT_ACME_SERVER='https://acme-v02.api.letsencrypt.org/directory'"
 
+- name: Check for existing account key
+  ansible.builtin.stat:
+    path: "host_files/{{ inventory_hostname }}/acmesh_letsencrypt_account.key"
+  register: st_accountkey
+  delegate_to: localhost
+
+- name: Create remote path for account.key
+  become: true
+  ansible.builtin.file:
+    path: "{{ acmesh_config_path }}/ca/acme-v02.api.letsencrypt.org/directory"
+    state: directory
+    mode: 0755
+    owner: "{{ acme_user }}"
+    group: "{{ acme_group }}"
+  when: st_accountkey.stat.exists
+
+- name: Deploy existing account key
+  become: true
+  ansible.builtin.copy:
+    dest: "{{ acmesh_config_path }}/ca/acme-v02.api.letsencrypt.org/directory/account.key"
+    src: "{{ st_accountkey.stat.path }}"
+    owner: "{{ acme_user }}"
+    group: "{{ acme_group }}"
+    mode: 0600
+  when: st_accountkey.stat.exists
+
 - name: "Create account key"
   become: true
   become_method: su
@@ -115,6 +141,7 @@
   environment:
     LE_WORKING_DIR: "{{ acmesh_install_path }}"
     LE_CONFIG_HOME: "{{ acmesh_config_path }}"
+  when: not st_accountkey.stat.exists
 
 - name: "Register account"
   become: true
