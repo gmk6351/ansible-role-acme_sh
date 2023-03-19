@@ -154,3 +154,32 @@
   environment:
     LE_WORKING_DIR: "{{ acmesh_install_path }}"
     LE_CONFIG_HOME: "{{ acmesh_config_path }}"
+
+- name: Issue certificate with FreeDNS
+  become: true
+  become_method: su
+  become_user: "{{ acme_user }}"
+  become_flags: '-s /bin/sh'
+  ansible.builtin.command:
+    cmd: >
+      "{{ acmesh_install_path }}/acme.sh"
+      --issue
+      --dns dns_freedns
+      -d "{{ item.domain }}"
+      {% if item.san is defined %}
+      {% for san in item.san %}
+      -d "{{ san }}"
+      {% endfor %}
+      {% endif %}
+      {% if item.keylength is defined %}
+      --keylength "{{ item.keylength }}"
+      {% endif %}
+      --staging
+    creates: "{{ acmesh_cert_path }}/{{ item.domain }}_ecc/{{ item.domain }}.cer"
+  environment:
+    LE_WORKING_DIR: "{{ acmesh_install_path }}"
+    LE_CONFIG_HOME: "{{ acmesh_config_path }}"
+    FREEDNS_User: "{{ freedns_user | mandatory}}"
+    FREEDNS_Password: "{{ freedns_password | mandatory}}"
+  loop: "{{ acme_domains }}"
+  when: acme_domains is defined
