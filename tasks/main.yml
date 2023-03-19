@@ -214,3 +214,30 @@
     group: "{{ acme_group }}"
   loop:
     - "{{ tls_cert_path }}"
+
+- name: Install certificates
+  become: true
+  become_method: su
+  become_user: "{{ acme_user }}"
+  become_flags: '-s /bin/sh'
+  ansible.builtin.command:
+    cmd: >
+      "{{ acmesh_install_path }}/acme.sh"
+      --installcert
+      -d "{{ item.domain }}"
+      {% if 'ec' in item.keylength %}
+      --ecc
+      {% endif %}
+      --cert-file "{{ tls_cert_path }}/{{ item.domain }}.crt"
+      --key-file "{{ tls_cert_path }}/{{ item.domain }}.key"
+      --ca-file "{{ tls_cert_path }}/{{ item.domain }}.ca"
+      --fullchain-file "{{ tls_cert_path }}/{{ item.domain }}.fullchain"
+      {% if item.reloadcmd is defined %}
+      --reloadcmd '{{ item.reloadcmd }}'
+      {% endif %}
+    creates: "{{ tls_cert_path }}/{{ item.domain }}.crt"
+  environment:
+    LE_WORKING_DIR: "{{ acmesh_install_path }}"
+    LE_CONFIG_HOME: "{{ acmesh_config_path }}"
+  loop: "{{ acme_domains }}"
+  when: acme_domains is defined
