@@ -183,3 +183,23 @@
     FREEDNS_Password: "{{ freedns_password | mandatory}}"
   loop: "{{ acme_domains }}"
   when: acme_domains is defined
+
+- name: Create sudo config file
+  become: true
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/60_user_{{ acme_user }}"
+    state: touch
+    mode: 0440
+    owner: root
+    group: root
+    access_time: preserve
+    modification_time: preserve
+
+- name: Configure sudo permissions
+  become: true
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/60_user_{{ acme_user }}"
+    line: "{{ acme_user }} ALL=(ALL:ALL) NOPASSWD: /usr/bin/{{ item.reloadcmd | regex_replace('^sudo (.*)$', '\\1') }}"
+    state: present
+  loop: "{{ acme_domains }}"
+  when: acme_domains is defined
