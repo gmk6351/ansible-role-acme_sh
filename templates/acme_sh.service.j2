@@ -1,0 +1,11 @@
+[Unit]
+Description=Renew certificates using acme.sh
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart={{ acmesh_install_path }}/acme.sh --cron --home {{ acmesh_install_path }} --config-home {{ acmesh_config_path }}
+User={{ acme_user }}
+Group={{ acme_group }}
+
+SuccessExitStatus=0 2

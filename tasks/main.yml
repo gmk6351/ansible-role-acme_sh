@@ -252,3 +252,13 @@
     state: file
   loop: "{{ acme_domains }}"
   when: acme_domains is defined
+
+- name: Install systemd service
+  become: true
+  ansible.builtin.template:
+    src: acme_sh.service.j2
+    dest: /etc/systemd/system/acme_sh.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload systemd daemon
