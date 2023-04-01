@@ -2,3 +2,9 @@
 - name: Reload systemd daemon
   ansible.builtin.systemd:
     daemon_reload: yes
+
+- name: Restart acme_sh systemd timer
+  ansible.builtin.systemd:
+    name: acme_sh.timer
+    scope: system
+    state: restarted

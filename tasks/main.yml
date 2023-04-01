@@ -262,3 +262,23 @@
     group: root
     mode: 0644
   notify: Reload systemd daemon
+
+- name: Install systemd timer
+  become: true
+  ansible.builtin.template:
+    src: acme_sh.timer.j2
+    dest: /etc/systemd/system/acme_sh.timer
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd daemon
+    - Restart acme_sh systemd timer
+
+- name: Enable systemd timer
+  become: true
+  ansible.builtin.systemd:
+    name: acme_sh.timer
+    enabled: true
+    scope: system
+    state: started
